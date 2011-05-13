@@ -64,7 +64,7 @@
 	[webView setUserInteractionEnabled:NO];
 	
 	NSString *getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var player = document.getElementById('player'); var video = player.getElementsByTagName('video')[0]; return video.getAttribute('src');} getURL();"];
-	NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var ol = document.getElementsByClassName('ol')[0]; return ol.childNodes[0].innerHTML;} getTitle();"];
+	NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var nl = document.getElementsByClassName('nl')[0]; return nl.childNodes[0].innerHTML;} getTitle();"];
 	NSString *getTitleFromChannel = [webView stringByEvaluatingJavaScriptFromString:@"function getTitleFromChannel() {var video_title = document.getElementById('video_title'); return video_title.childNodes[0].innerHTML;} getTitleFromChannel();"];
 	
 	[webView setUserInteractionEnabled:YES];
