@@ -19,17 +19,15 @@
 //  along with MyTube.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import <UIKit/UIKit.h>
-
 @class MyTubeViewController;
 
 @interface MyTubeAppDelegate : NSObject <UIApplicationDelegate> {
-    UIWindow *window;
     MyTubeViewController *viewController;
+    UIWindow *window;
 }
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) IBOutlet MyTubeViewController *viewController;
+@property (nonatomic, retain) IBOutlet UIWindow *window;
 
 @end
 

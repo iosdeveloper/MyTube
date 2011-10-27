@@ -19,21 +19,17 @@
 //  along with MyTube.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import <MediaPlayer/MediaPlayer.h>
 
 @interface DownloadsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
 	IBOutlet UINavigationItem *navItem;
 	IBOutlet UITableView *table;
 	
-	NSString *_DownloadsPath;
 	NSArray *_DownloadsContents;
+	NSString *_DownloadsPath;
 }
 
-@property (retain, readwrite) NSString *path;
 @property (retain, readwrite) NSArray *contents;
-
-- (IBAction)back;
+@property (retain, readwrite) NSString *path;
 
 @end

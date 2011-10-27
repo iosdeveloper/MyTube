@@ -131,9 +131,9 @@ possibleFilename;
 	//[connection release];
 }
 
-- (void)drawRect:(CGRect)rect {
-	[super drawRect:rect];
-}
+//- (void)drawRect:(CGRect)rect {
+//	[super drawRect:rect];
+//}
 
 - (void)dealloc {
 	[possibleFilename release];

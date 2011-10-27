@@ -19,6 +19,7 @@
 //  along with MyTube.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#import "DownloadsViewController.h"
 #import "MyTubeViewController.h"
 
 @implementation MyTubeViewController
@@ -29,8 +30,11 @@
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
-	
-	[[UIApplication sharedApplication] setDelegate:self];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    [webView setBackgroundColor:[UIColor clearColor]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -46,7 +50,6 @@
 	[bar removeFromSuperview];
 	
 	[videoTitle release];
-	videoTitle = nil;
 	
 	[downloadButton setEnabled:YES];
 }
@@ -62,11 +65,23 @@
 	[downloadButton setEnabled:NO];
 	
 	[webView setUserInteractionEnabled:NO];
-	
-	NSString *getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var player = document.getElementById('player'); var video = player.getElementsByTagName('video')[0]; return video.getAttribute('src');} getURL();"];
-	NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var kp = document.getElementsByClassName('kp')[0]; return kp.childNodes[0].innerHTML;} getTitle();"];
+    
+    UIUserInterfaceIdiom userInterfaceIdiom = [UIDevice currentDevice].userInterfaceIdiom;
+    
+    NSString *getURL = @"";
+    
+    if (userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var player = document.getElementById('player'); var video = player.getElementsByTagName('video')[0]; return video.getAttribute('src');} getURL();"];
+    } else {
+        getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var bh = document.getElementsByClassName('bh')[0]; return bh.getAttribute('src');} getURL();"];
+    }
+    
+    NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var lp = document.getElementsByClassName('lp')[0]; return lp.childNodes[0].innerHTML;} getTitle();"];
+    
 	NSString *getTitleFromChannel = [webView stringByEvaluatingJavaScriptFromString:@"function getTitleFromChannel() {var video_title = document.getElementById('video_title'); return video_title.childNodes[0].innerHTML;} getTitleFromChannel();"];
-	
+    
+    //NSLog(@"%@, %@, %@", getURL, getTitle, getTitleFromChannel);
+    
 	[webView setUserInteractionEnabled:YES];
 	
 	NSArray *components = [getTitle componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
@@ -74,8 +89,7 @@
 	
 	if ([getURL length] > 0) {
 		if ([getTitle length] > 0) {
-			videoTitle = getTitle;
-			[videoTitle retain];
+			videoTitle = [getTitle retain];
 			
 			bar = [[UIDownloadBar alloc] initWithURL:[NSURL URLWithString:getURL]
 									progressBarFrame:CGRectMake(85.0, 17.0, 150.0, 11.0)
@@ -92,8 +106,7 @@
 			getTitleFromChannel = [components componentsJoinedByString:@" "];
 			
 			if ([getTitleFromChannel length] > 0) {
-				videoTitle = getTitleFromChannel;
-				[videoTitle retain];
+				videoTitle = [getTitleFromChannel retain];
 				
 				bar = [[UIDownloadBar alloc] initWithURL:[NSURL URLWithString:getURL]
 										progressBarFrame:CGRectMake(85.0, 17.0, 150.0, 11.0)
@@ -106,7 +119,10 @@
 				
 				[bar release];
 			} else {
+                //NSLog(@"%@", [webView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('html')[0].innerHTML;"]);
+                
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"MyTube" message:@"Couldn't get video title." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                
                 [alertView show];
                 [alertView release];
                 
@@ -114,7 +130,10 @@
 			}
 		}
 	} else {
+        //NSLog(@"%@", [webView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('html')[0].innerHTML;"]);
+        
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"MyTube" message:@"Couldn't get MP4 URL." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        
         [alertView show];
         [alertView release];
         
@@ -156,7 +175,7 @@
 	
 	AVAssetImageGenerator *imageGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
 	
-	Float64 durationSeconds = CMTimeGetSeconds([asset duration]);
+	Float64 durationSeconds = CMTimeGetSeconds(asset.duration);
 	
 	CMTime midpoint = CMTimeMakeWithSeconds(durationSeconds / 2.0, 600);
 	CMTime actualTime;
@@ -184,20 +203,18 @@
 	[asset release];
 	
 	[videoTitle release];
-	videoTitle = nil;
 	
 	[downloadBar removeFromSuperview];
 	
-	[downloadButton setEnabled:TRUE];
+	[downloadButton setEnabled:YES];
 }
 
 - (void)downloadBar:(UIDownloadBar *)downloadBar didFailWithError:(NSError *)error {
 	[videoTitle release];
-	videoTitle = nil;
 	
 	[downloadBar removeFromSuperview];
 	
-	[downloadButton setEnabled:TRUE];
+	[downloadButton setEnabled:YES];
 }
 
 - (void)downloadBarUpdated:(UIDownloadBar *)downloadBar {}
@@ -221,12 +238,14 @@
 }
 
 - (void)viewDidUnload {
+    [super viewDidUnload];
+    
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
 }
 
 - (void)dealloc {
-	[bar release];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 	
     [super dealloc];
 }

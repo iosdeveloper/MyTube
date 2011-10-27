@@ -20,18 +20,19 @@
 //
 
 #import "DownloadsViewController.h"
+#import <MediaPlayer/MediaPlayer.h>
 
 @implementation DownloadsViewController
 
-@synthesize path = _DownloadsPath;
 @synthesize contents = _DownloadsContents;
+@synthesize path = _DownloadsPath;
 
 #pragma mark -
 #pragma mark Initialization
 
 - (void)loadContents {
 	NSFileManager *fileManager = [NSFileManager defaultManager];
-	NSString *path = [self path];
+	NSString *path = self.path;
 	NSArray *files = [[fileManager contentsOfDirectoryAtPath:path error:NULL] pathsMatchingExtensions:[NSArray arrayWithObject:@"mp4"]];
 	
 	if (files) {
@@ -57,13 +58,11 @@
 	
 	[self loadContents];
 	
+    [navItem setLeftBarButtonItem:[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(back)] autorelease]];
 	[navItem setRightBarButtonItem:self.editButtonItem];
 }
 
-#pragma mark -
-#pragma mark IBActions
-
-- (IBAction)back {
+- (void)back {
 	[self dismissModalViewControllerAnimated:YES];
 }
 
@@ -99,11 +98,11 @@
 	
     // Configure the cell...
 	
-	NSString *moviePath = [NSString stringWithFormat:@"%@.mp4", [[self path] stringByAppendingPathComponent:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]]];
+	NSString *moviePath = [NSString stringWithFormat:@"%@.mp4", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 	
 	AVAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:moviePath] options:nil];
 	
-	NSString *imagePath = [NSString stringWithFormat:@"%@.png", [[self path] stringByAppendingPathComponent:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]]];
+	NSString *imagePath = [NSString stringWithFormat:@"%@.png", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 	
 	int durationSec = (int)CMTimeGetSeconds(asset.duration);
 	int min = durationSec / 60;
@@ -111,11 +110,11 @@
 	
 	[asset release];
 	
-	[[cell textLabel] setMinimumFontSize:14.0];
-	[[cell textLabel] setAdjustsFontSizeToFitWidth:YES];
-	[[cell textLabel] setText:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]];
-	[[cell detailTextLabel] setText:[NSString stringWithFormat:@"%d:%02d", min, sec]];
-	[[cell imageView] setImage:[UIImage imageWithContentsOfFile:imagePath]];
+	[cell.textLabel setMinimumFontSize:14.0];
+	[cell.textLabel setAdjustsFontSizeToFitWidth:YES];
+	[cell.textLabel setText:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]];
+	[cell.detailTextLabel setText:[NSString stringWithFormat:@"%d:%02d", min, sec]];
+	[cell.imageView setImage:[UIImage imageWithContentsOfFile:imagePath]];
 	
     return cell;
 }
@@ -134,10 +133,10 @@
         // Delete the row from the data source.
 		NSFileManager *fileManager = [NSFileManager defaultManager];
 		
-		NSString *moviePath = [NSString stringWithFormat:@"%@.mp4", [[self path] stringByAppendingPathComponent:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]]];
+		NSString *moviePath = [NSString stringWithFormat:@"%@.mp4", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 		[fileManager removeItemAtPath:moviePath error:NULL];
 		
-		NSString *imagePath = [NSString stringWithFormat:@"%@.png", [[self path] stringByAppendingPathComponent:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]]];
+		NSString *imagePath = [NSString stringWithFormat:@"%@.png", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 		[fileManager removeItemAtPath:imagePath error:NULL];
 		
 		[self setContents:nil];
@@ -177,7 +176,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [table deselectRowAtIndexPath:indexPath animated:TRUE];
 	
-	NSString *contentURL = [NSString stringWithFormat:@"%@.mp4", [[self path] stringByAppendingPathComponent:[[self contents] objectAtIndex:[indexPath indexAtPosition:1]]]];
+	NSString *contentURL = [NSString stringWithFormat:@"%@.mp4", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 	
 	MPMoviePlayerViewController *moviePlayerViewController = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL fileURLWithPath:contentURL]];
 	if (moviePlayerViewController) {
@@ -219,8 +218,8 @@
 }
 
 - (void)dealloc {
-	[self setPath:nil];
 	[self setContents:nil];
+	[self setPath:nil];
 	
     [super dealloc];
 }

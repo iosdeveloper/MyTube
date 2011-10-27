@@ -24,8 +24,7 @@
 
 @implementation MyTubeAppDelegate
 
-@synthesize window;
-@synthesize viewController;
+@synthesize viewController, window;
 
 
 #pragma mark -

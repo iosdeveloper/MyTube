@@ -19,14 +19,12 @@
 //  along with MyTube.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import <UIKit/UIKit.h>
 #import "UIDownloadBar.h"
-#import "DownloadsViewController.h"
 
-@interface MyTubeViewController : UIViewController <UIAlertViewDelegate, UIApplicationDelegate, UIDownloadBarDelegate, UIWebViewDelegate> {
-	IBOutlet UIWebView *webView;
+@interface MyTubeViewController : UIViewController <UIDownloadBarDelegate, UIWebViewDelegate> {
+    IBOutlet UIBarButtonItem *downloadButton;
 	IBOutlet UIToolbar *toolbar;
-	IBOutlet UIBarButtonItem *downloadButton;
+	IBOutlet UIWebView *webView;
 	
 	NSString *videoTitle;
 	
