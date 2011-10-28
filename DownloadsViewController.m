@@ -55,7 +55,6 @@
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
 	
 	[self setPath:[paths objectAtIndex:0]];
-	
 	[self loadContents];
 	
     [navItem setLeftBarButtonItem:[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(back)] autorelease]];
@@ -71,7 +70,8 @@
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
 	[super setEditing:editing animated:animated];
-	[table setEditing:editing animated:YES];
+	
+    [table setEditing:editing animated:YES];
 }
 
 #pragma mark -
@@ -84,7 +84,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-	return [[self contents] count];
+	return [self.contents count];
 }
 
 // Customize the appearance of table view cells.
@@ -140,7 +140,6 @@
 		[fileManager removeItemAtPath:imagePath error:NULL];
 		
 		[self setContents:nil];
-		
 		[self loadContents];
 
 		[table deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -174,7 +173,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [table deselectRowAtIndexPath:indexPath animated:TRUE];
+    [table deselectRowAtIndexPath:indexPath animated:YES];
 	
 	NSString *contentURL = [NSString stringWithFormat:@"%@.mp4", [self.path stringByAppendingPathComponent:[self.contents objectAtIndex:[indexPath indexAtPosition:1]]]];
 	
@@ -182,6 +181,10 @@
 	if (moviePlayerViewController) {
 		[self presentMoviePlayerViewControllerAnimated:moviePlayerViewController];
 		[moviePlayerViewController.moviePlayer setMovieSourceType:MPMovieSourceTypeFile];
+        
+        if ([moviePlayerViewController.moviePlayer respondsToSelector:@selector(setAllowsAirPlay:)]) {
+            [moviePlayerViewController.moviePlayer setAllowsAirPlay:YES];
+        }
 		
 		[[NSNotificationCenter defaultCenter] addObserverForName:MPMoviePlayerPlaybackDidFinishNotification object:moviePlayerViewController queue:nil usingBlock:^(NSNotification *notification) {
 			[[NSNotificationCenter defaultCenter] removeObserver:self];

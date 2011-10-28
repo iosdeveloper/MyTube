@@ -46,10 +46,17 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-	[bar forceStop];
-	[bar removeFromSuperview];
-	
-	[videoTitle release];
+    if (bar) {
+        [bar forceStop];
+        [bar removeFromSuperview];
+        [bar release];
+        bar = nil;
+    }
+    
+    if (videoTitle) {
+        [videoTitle release];
+        videoTitle = nil;
+    }
 	
 	[downloadButton setEnabled:YES];
 }
@@ -76,7 +83,7 @@
         getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var bh = document.getElementsByClassName('bh')[0]; return bh.getAttribute('src');} getURL();"];
     }
     
-    NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var lp = document.getElementsByClassName('lp')[0]; return lp.childNodes[0].innerHTML;} getTitle();"];
+    NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var jm = document.getElementsByClassName('jm'); if (jm.length) {return jm[0].innerHTML;} else {var lp = document.getElementsByClassName('lp')[0]; return lp.childNodes[0].innerHTML;}} getTitle();"];
     
 	NSString *getTitleFromChannel = [webView stringByEvaluatingJavaScriptFromString:@"function getTitleFromChannel() {var video_title = document.getElementById('video_title'); return video_title.childNodes[0].innerHTML;} getTitleFromChannel();"];
     
@@ -99,8 +106,6 @@
 			[bar setProgressViewStyle:UIProgressViewStyleBar];
 			
 			[toolbar addSubview:bar];
-			
-			[bar release];
 		} else {
 			NSArray *components = [getTitleFromChannel componentsSeparatedByCharactersInSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]];
 			getTitleFromChannel = [components componentsJoinedByString:@" "];
@@ -116,8 +121,6 @@
 				[bar setProgressViewStyle:UIProgressViewStyleBar];
 				
 				[toolbar addSubview:bar];
-				
-				[bar release];
 			} else {
                 //NSLog(@"%@", [webView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('html')[0].innerHTML;"]);
                 
@@ -203,16 +206,22 @@
 	[asset release];
 	
 	[videoTitle release];
+    videoTitle = nil;
 	
 	[downloadBar removeFromSuperview];
+    [bar release];
+    bar = nil;
 	
 	[downloadButton setEnabled:YES];
 }
 
 - (void)downloadBar:(UIDownloadBar *)downloadBar didFailWithError:(NSError *)error {
 	[videoTitle release];
+    videoTitle = nil;
 	
 	[downloadBar removeFromSuperview];
+    [bar release];
+    bar = nil;
 	
 	[downloadButton setEnabled:YES];
 }
