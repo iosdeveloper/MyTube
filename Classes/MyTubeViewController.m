@@ -80,7 +80,7 @@
     if (userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var player = document.getElementById('player'); var video = player.getElementsByTagName('video')[0]; return video.getAttribute('src');} getURL();"];
     } else {
-        getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var bh = document.getElementsByClassName('bh')[0]; return bh.getAttribute('src');} getURL();"];
+        getURL = [webView stringByEvaluatingJavaScriptFromString:@"function getURL() {var bh = document.getElementsByClassName('bh'); if (bh.length) {return bh[0].getAttribute('src');} else {var zq = document.getElementsByClassName('zq')[0]; return zq.getAttribute('src');}} getURL();"];
     }
     
     NSString *getTitle = [webView stringByEvaluatingJavaScriptFromString:@"function getTitle() {var jm = document.getElementsByClassName('jm'); if (jm.length) {return jm[0].innerHTML;} else {var lp = document.getElementsByClassName('lp')[0]; return lp.childNodes[0].innerHTML;}} getTitle();"];
